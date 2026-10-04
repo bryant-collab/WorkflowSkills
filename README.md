@@ -1,6 +1,6 @@
 # WorkflowSkills
 
-Reusable engineering workflows for Codex, adapted from Lauren Tan's **pstack** for Windows and GitHub development. The 50 skills work across codebases: each task uses the current repository's instructions, contracts, remotes and existing checks. C#, Python, PowerShell, batch and web projects keep their own tooling.
+Reusable engineering workflows for Codex, adapted from Lauren Tan's **pstack** for Windows development. The 54 skills work across codebases: each task uses the current repository's instructions, contracts, remotes and existing checks. C#, Python, PowerShell, batch and web projects keep their own tooling. Jira requirements and PR hosting are independent; work profiles prohibit AI merging and make PR delivery and babysitting separate options.
 
 ## Layout
 
@@ -9,6 +9,7 @@ WorkflowSkills/
   README.md
   LICENSE.md
   skill-dependencies.json
+  install.ps1
   skills/
     how/SKILL.md
     github-delivery/SKILL.md
@@ -43,6 +44,10 @@ Start with the skill that matches the requested outcome. Small tasks can run dir
 | [technical-writing](skills/technical-writing/SKILL.md) | Write clear issues, PR descriptions and technical documentation. |
 | [unslop](skills/unslop/SKILL.md) | Remove filler and unsupported claims while preserving precision. |
 | [github-delivery](skills/github-delivery/SKILL.md) | Deliver an authorized change through repository checks and a PR, or inspect current-head PR status. |
+| [pr-delivery](skills/pr-delivery/SKILL.md) | Deliver Jira, GitHub Issue, or supplied requirements as a PR and hand off after one initial status pass. |
+| [pr-babysit](skills/pr-babysit/SKILL.md) | Inspect, explicitly watch, or repair an existing PR; always stop before merging or auto-merge. |
+| [jira-workflow](skills/jira-workflow/SKILL.md) | Ground work in Jira acceptance criteria and linked evidence, with supplied-text fallback and separately authorized ticket updates. |
+| [work-mode](skills/work-mode/SKILL.md) | Route work C# development through Jira and engineering checks, with a strict no-merge policy and optional PR modules. |
 | [arena](skills/arena/SKILL.md) | Compare bounded candidates and synthesize a coherent result. |
 | [swarm](skills/swarm/SKILL.md) | Divide substantial coverage into isolated slices and aggregate actual evidence. |
 | [interrogate](skills/interrogate/SKILL.md) | Review adversarially, verify findings and return a report before changes. |
@@ -68,6 +73,57 @@ The other 24 skills are `principle-*` references. Load the principle that change
 | Learning | encode-lessons-in-structure |
 
 ## Install selected skills
+
+Run the interactive installer from this checkout:
+
+```powershell
+.\install.ps1
+```
+
+It asks which set to install and where to install it, then copies complete skill folders and their dependency closure. It works with Windows PowerShell 5.1 and is designed for PowerShell 7 as well; testing was performed on Windows PowerShell 5.1. No download, tool installation, authentication, watcher, or global configuration change is performed.
+
+| Menu | Profile | Fresh install | Behavior |
+| --- | --- | --- | --- |
+| 1 | `HomeFull` | 52 skills | Full general collection, including both PR modules and the existing combined GitHub/router workflows. Excludes `work-mode` and `jira-workflow`. |
+| 2 | `WorkCore` | 30 skills | C# + Jira engineering; no PR delivery or babysitting modules. |
+| 3 | `WorkDelivery` | 31 skills | Work core plus PR delivery and one initial status pass. |
+| 4 | `WorkBabysit` | 31 skills | Work core plus status, requested monitoring, and authorized repair of existing PRs. |
+| 5 | `WorkBoth` | 32 skills | Work core with both PR modules. |
+| 6 | `PRDelivery` | 8 skills | Install delivery independently with its engineering dependencies. Preserve previously managed skills. |
+| 7 | `PRBabysit` | 7 skills | Install babysitting independently with its engineering dependencies. Preserve previously managed skills. |
+
+PR delivery never starts ongoing observation. Both standalone PR modules stop before merge and auto-merge. `pr-babysit` does not depend on `pr-delivery`, and vice versa. The existing `github-delivery` and `poteto-mode` remain available in the home collection; work profiles exclude them so they cannot pull combined PR workflows into the work dependency closure.
+
+Work profiles require a destination repository and install into its `.agents/skills`. They also add or update a marked block in root `AGENTS.md`, preserving other content. This block prohibits AI merging/auto-merge, identifies Jira as the requirements source, and enables or disables delivery and ongoing babysitting according to the selected modules. A requested one-time read-only status check remains allowed when babysitting is disabled. Enabled babysitting requires a specific request and one observer coordinated with the user's existing PR monitor application.
+
+For home and individual modules, choose user-wide or repository scope. If both home and work are on the same user account, user-wide and ancestor skills remain discoverable in a work repository; project installation does not hide them. The work `AGENTS.md` block governs their use there. Separate user environments are necessary if you require physical separation of available skills. These instructions are workflow policy, not a Git-host permission control; repository protections remain independent. See the official [skill locations](https://learn.chatgpt.com/docs/build-skills) and [project guidance](https://learn.chatgpt.com/docs/customization/overview).
+
+Parameters support repeatable installation and previews:
+
+```powershell
+# Preview the work set without writing files.
+.\install.ps1 -Profile WorkCore -ProjectPath D:\git\WorkApp -WhatIf
+
+# Install work skills and policy into the selected repository.
+.\install.ps1 -Profile WorkCore -ProjectPath D:\git\WorkApp
+
+# Add only delivery later; existing work skills and no-merge policy remain.
+.\install.ps1 -Profile PRDelivery -Scope Project -ProjectPath D:\git\WorkApp
+
+# Add babysitting when you decide to use it.
+.\install.ps1 -Profile PRBabysit -Scope Project -ProjectPath D:\git\WorkApp
+
+# Home installation across personal repositories.
+.\install.ps1 -Profile HomeFull -Scope User
+```
+
+Home/work profiles replace the installer's previously managed selection at that destination; individual PR options are additive. Selecting `WorkCore` after `WorkBoth` removes unchanged, previously managed PR modules and disables their work policy entries. It does not delete unmanaged skills or silently turn a work destination into a home destination. Use a separate destination for home. Updates/removal stop before writing if a managed skill has local edits or a requested name already exists unmanaged; reconcile or back up those files yourself before retrying.
+
+Receipts, retained previous folders, and a license copy live in `.agents/.workflowskills`, outside the skill discovery tree. Copies are staged and checked before replacement; installation failures restore replaced skill folders and policy. Windows PowerShell users with very long destination paths should use a shorter checkout path or PowerShell 7. If installed skills do not appear, restart Codex.
+
+The Jira workflow discovers integrations already available in the session; the installer does not provide a Jira connector or credentials. Without live Jira access, supplied ticket text remains usable and unverified live state is identified. Ticket changes, comments, and transitions require authorization for those actions. C# verification uses each repository's actual .NET SDK, tests, analyzers, and runtime paths.
+
+### Manual selection
 
 This repository is the source collection. For personal use across repositories, copy selected skill folders to your user's `.agents/skills`. For team use, copy them to a project's `.agents/skills`. Codex supports these locations and explicit or automatic invocation; see [official Build skills documentation](https://learn.chatgpt.com/docs/build-skills). Check for duplicate names first and confirm discovery in a fresh session.
 
@@ -116,6 +172,10 @@ $create-verification-skill Create and execute verification for this project's CL
 $github-delivery Implement this issue and open a PR in the named repository.
 $github-delivery Check this PR's current-head CI and review status; keep it read-only.
 $poteto-mode Help me complete this feature using the appropriate workflow.
+$work-mode Implement the supplied Jira ticket using this work repository's C# checks.
+$jira-workflow Read PROJ-123 and summarize its acceptance criteria; do not update it.
+$pr-delivery Implement this Jira ticket and open a PR; hand off after initial status.
+$pr-babysit Watch this existing PR until CI completes; never merge it.
 ```
 
 Provide the repository, issue or diff, desired outcome and relevant constraints. The workflows inherit supported model settings and use available tools. Delegation needs task authorization and isolated ownership; unavailable delegation can use an honestly labeled sequential fallback. A status or review request remains read-only. PR creation, external messages, recurring work, deployment and merging follow the user's actual authorization.
@@ -124,7 +184,7 @@ Provide the repository, issue or diff, desired outcome and relevant constraints.
 
 Most skills are instructions. Executable verification uses the target project's existing tools: a supported .NET SDK for C#, its Python environment, PowerShell or `cmd.exe`, or the web project's own stack. The bundled decision-log helper uses Python's standard library. GitHub operations prefer available `gh-axi` commands, with supported alternatives for gaps. Personal-style authoring uses Skill Creator when available.
 
-Packaging validation passed for all 50 manifests and local references. Ten packaging regression/closure cases and six decision-log tests passed. Focused Python and Windows script fixtures, a real Electron/GitHub pilot, and bounded independent review/history/router evaluations supplied behavioral evidence. This does not establish every workflow or fresh-session discovery in every client. Real C# repository coverage remains incomplete. Orchestrate, Autopilot-full, Autopilot-stack and automatic worktree cleanup execution remain explicitly deferred in their guides.
+The original 50 manifests and local references passed packaging validation, with ten packaging regression/closure cases and six decision-log tests. Focused Python and Windows script fixtures, a real Electron/GitHub pilot, and bounded independent review/history/router evaluations supplied behavioral evidence. The Jira/work and modular PR additions have manifest/reference validation and a GPT-6.1 Sol review. Run `tests/install-skills.Tests.ps1` for isolated installer integration checks covering every profile, dependency isolation, additive modules, downgrade/removal, local-edit protection, policy preservation, previews, and rollback. This does not establish every workflow or fresh-session discovery in every client. Live Jira access and real C# repository coverage remain unverified for these additions. Orchestrate, Autopilot-full, Autopilot-stack and automatic worktree cleanup execution remain explicitly deferred in their guides.
 
 ## Credit and license
 

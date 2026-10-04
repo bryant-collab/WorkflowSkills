@@ -1,6 +1,6 @@
 ---
 name: why
-description: Investigate the historical reasons for code, design choices, defensive checks, regressions, or thresholds using cited Git, GitHub, and repository evidence. Use how for runtime mechanics.
+description: Investigate the historical reasons for code, design choices, defensive checks, regressions, or thresholds using cited Git, ticket, pull-request, and repository evidence. Use how for runtime mechanics.
 ---
 
 # Why
@@ -9,7 +9,7 @@ Answer what forces led to the code's shape. Keep the investigation read-only, in
 
 Read [confidence guidance](references/epistemics.md) before synthesizing. Use [how](../how/SKILL.md) only for mechanics needed to understand the target.
 
-Anchor the question in verified files, lines, symbols, and relevant commits. State a scoped interpretation when the target is ambiguous. Start with Git history, linked GitHub PRs and Issues, code comments, tests, and repository design documents. Follow the focused [history search guide](references/history-search.md). Prefer documented gh-axi operations, then available GitHub connectors or gh for gaps; inspect command help rather than inventing flags.
+Anchor the question in verified files, lines, symbols, and relevant commits. State a scoped interpretation when the target is ambiguous. Start with Git history, linked tickets and PRs on the actual host, code comments, tests, and repository design documents. Follow the focused [history search guide](references/history-search.md). For GitHub, prefer documented gh-axi operations, then available GitHub connectors or gh for gaps; inspect command help rather than inventing flags. For Jira, discover available connector or configured CLI capabilities, or use supplied ticket text with its freshness limits. Do not assume acceptance criteria live in a particular field, or treat a ticket key in a commit message as verified historical evidence.
 
 Trace the introduction and meaningful changes, including renames, instead of treating the latest touch as the original decision. Review diffs as well as messages. A PR reference in a commit subject is a lead to verify. Follow issue, incident, or design links when they bear on the question.
 

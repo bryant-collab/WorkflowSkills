@@ -51,6 +51,7 @@
     "why"
   ],
   "interrogate": [],
+  "jira-workflow": [],
   "maintain-verification-skill": [
     "create-verification-skill"
   ],
@@ -62,6 +63,16 @@
     "tdd",
     "technical-writing",
     "why"
+  ],
+  "pr-delivery": [
+    "blast-radius",
+    "how",
+    "tdd",
+    "technical-writing"
+  ],
+  "pr-babysit": [
+    "blast-radius",
+    "tdd"
   ],
   "principle-attack-the-premise": [],
   "principle-boundary-discipline": [],
@@ -120,6 +131,29 @@
     "principle-type-system-discipline"
   ],
   "unslop": [],
+  "work-mode": [
+    "jira-workflow",
+    "how",
+    "why",
+    "teach",
+    "architect",
+    "figure-it-out",
+    "tdd",
+    "blast-radius",
+    "interrogate",
+    "create-verification-skill",
+    "maintain-verification-skill",
+    "technical-writing",
+    "comment-quality",
+    "unslop",
+    "recall",
+    "principle-model-the-domain",
+    "principle-type-system-discipline",
+    "principle-boundary-discipline",
+    "principle-make-operations-idempotent",
+    "principle-fix-root-causes",
+    "principle-prove-it-works"
+  ],
   "why": [
     "how"
   ]

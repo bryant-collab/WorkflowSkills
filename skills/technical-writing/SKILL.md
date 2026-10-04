@@ -18,3 +18,5 @@ Prefer familiar words and concrete mechanisms. Keep necessary articles and verbs
 Use informative sentence-case headings, descriptive links, numbered sequences, parallel comparison lists, and code formatting for code. Apply [unslop](../unslop/SKILL.md) for redundant filler and mannered prose. Do not erase supported qualifications to sound decisive.
 
 For PR descriptions, state the trigger or problem and resulting behavior, then relevant validation and limitations. Scale detail to the change and follow the repository template. A commit message should identify the substantive change. Avoid pasting orchestration logs; link proof artifacts when needed. Product UI strings follow the product's copy conventions.
+
+For Jira-backed work, include the verified ticket key and link when relevant, and connect substantive acceptance criteria to the checks actually performed. Keep proposed ticket comments distinct from authorized published updates. Do not invent requirement text, claim unexecuted verification, or require a duplicate GitHub Issue.
