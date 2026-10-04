@@ -1,0 +1,9 @@
+# Read-only PR status
+
+Resolve the exact canonical repository and PR. Read its current head SHA, base, open/closed/merged state, draft status, mergeability and merge-state verdict, required checks, current review decisions, and unresolved review threads. Inspect the available tool's help/schema; use connectors or `gh` for gaps in `gh-axi`. Paginate review threads and check results where necessary. Do not mistake comments for reviews or a review summary for the full unresolved-thread list.
+
+Associate check runs and commit statuses with the current head. An earlier head's green result is stale evidence. Distinguish passed, failed, running, pending, skipped, absent, cancelled, and inaccessible checks. A green visible list alone does not establish that all required checks or approvals are satisfied. If branch protection, rulesets, thread state, or mergeability cannot be read, name the missing surface and limit the conclusion. GitHub may report mergeability as unknown while computing it; report that state rather than inventing a verdict.
+
+Read review findings skeptically and distinguish unresolved discussions from verified defects. A draft is not ready for merge even when checks pass. Report required approvals and changes requested separately from CI. Preserve uncertainty when GitHub's merge-state verdict conflicts with observed checks. State the head and observation time so later changes are detectable.
+
+Return a concise verdict with the PR link, current head, draft/state, checks, approvals, unresolved threads, merge blockers, and material gaps. A read-only pass never commits, pushes, creates or edits a PR, marks ready, posts replies, resolves threads, reruns checks, merges, arms auto-merge, or starts recurring monitoring. If asked to watch in-session, keep one observer and an agreed stopping boundary; scheduled monitoring is a separate requested action.

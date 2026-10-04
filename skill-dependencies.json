@@ -1,0 +1,126 @@
+{
+  "architect": [
+    "how",
+    "principle-redesign-from-first-principles",
+    "principle-subtract-before-you-add",
+    "why"
+  ],
+  "arena": [
+    "principle-prove-it-works",
+    "principle-redesign-from-first-principles",
+    "principle-separate-before-serializing-shared-state"
+  ],
+  "automate-me": [
+    "unslop"
+  ],
+  "benchmark-checklist": [
+    "principle-explain-the-number"
+  ],
+  "blast-radius": [
+    "how",
+    "unslop",
+    "why"
+  ],
+  "bro": [],
+  "comment-quality": [
+    "how",
+    "why"
+  ],
+  "correct": [
+    "principle-encode-lessons-in-structure"
+  ],
+  "create-verification-skill": [
+    "maintain-verification-skill"
+  ],
+  "figure-it-out": [
+    "architect",
+    "correct",
+    "principle-encode-lessons-in-structure",
+    "principle-prove-it-works",
+    "principle-sequence-verifiable-units",
+    "show-me-your-work"
+  ],
+  "github-delivery": [
+    "blast-radius",
+    "how",
+    "tdd",
+    "technical-writing",
+    "why"
+  ],
+  "how": [
+    "why"
+  ],
+  "interrogate": [],
+  "maintain-verification-skill": [
+    "create-verification-skill"
+  ],
+  "poteto-mode": [
+    "architect",
+    "benchmark-checklist",
+    "github-delivery",
+    "how",
+    "tdd",
+    "technical-writing",
+    "why"
+  ],
+  "principle-attack-the-premise": [],
+  "principle-boundary-discipline": [],
+  "principle-build-the-lever": [],
+  "principle-encode-lessons-in-structure": [],
+  "principle-exhaust-the-design-space": [],
+  "principle-experience-first": [],
+  "principle-explain-the-number": [],
+  "principle-fix-root-causes": [],
+  "principle-foundational-thinking": [],
+  "principle-guard-the-context-window": [],
+  "principle-laziness-protocol": [
+    "principle-build-the-lever"
+  ],
+  "principle-make-operations-idempotent": [],
+  "principle-migrate-callers-then-delete-legacy-apis": [],
+  "principle-minimize-reader-load": [],
+  "principle-model-the-domain": [],
+  "principle-never-block-on-the-human": [],
+  "principle-outcome-oriented-execution": [],
+  "principle-prove-it-works": [],
+  "principle-redesign-from-first-principles": [],
+  "principle-separate-before-serializing-shared-state": [],
+  "principle-sequence-verifiable-units": [],
+  "principle-subtract-before-you-add": [
+    "principle-migrate-callers-then-delete-legacy-apis"
+  ],
+  "principle-test-behavior-not-implementation": [],
+  "principle-type-system-discipline": [],
+  "recall": [
+    "unslop",
+    "why"
+  ],
+  "reflect": [
+    "principle-encode-lessons-in-structure"
+  ],
+  "setup-pstack": [],
+  "show-me-your-work": [
+    "unslop"
+  ],
+  "swarm": [
+    "principle-separate-before-serializing-shared-state"
+  ],
+  "tdd": [
+    "principle-test-behavior-not-implementation"
+  ],
+  "teach": [
+    "how",
+    "unslop",
+    "why"
+  ],
+  "technical-writing": [
+    "unslop"
+  ],
+  "typescript-best-practices": [
+    "principle-type-system-discipline"
+  ],
+  "unslop": [],
+  "why": [
+    "how"
+  ]
+}
