@@ -7,6 +7,8 @@ Interactively install WorkflowSkills, or select a profile with parameters.
 .EXAMPLE
 .\install.ps1 -Profile WorkCore -ProjectPath D:\git\WorkApp -WhatIf
 .EXAMPLE
+.\install.ps1 -Profile WorkCore -Scope User
+.EXAMPLE
 .\install.ps1 -Profile PRDelivery -Scope Project -ProjectPath D:\git\WorkApp
 .EXAMPLE
 .\install.ps1 -Profile WorkCore -Client ClaudeCode -ProjectPath D:\git\WorkApp
@@ -126,13 +128,17 @@ if (-not $Client) {
 
 $isWork = $Profile.StartsWith('Work')
 $isAddon = $Profile -in @('PRDelivery', 'PRBabysit')
-if ($isWork) {
-    if ($Scope -eq 'User') { throw 'Work profiles require Project scope to keep work policy out of home projects.' }
-    $Scope = 'Project'
-} elseif (-not $Scope) {
+if (-not $Scope) {
     if ($ProjectPath) { $Scope = 'Project' }
     else {
-        do { $answer = (Read-Host 'Install for this user (U) or a specific repository (P)? [U]').Trim() } while ($answer -notmatch '^([uUpP])?$')
+        $defaultScopeAnswer = if ($isWork) { 'P' } else { 'U' }
+        $scopePrompt = if ($isWork) {
+            'Install work-profile skills for a specific repository (P) or for this user (U)? [P]'
+        } else {
+            'Install skills for this user (U) or a specific repository (P)? [U]'
+        }
+        do { $answer = (Read-Host $scopePrompt).Trim() } while ($answer -notmatch '^([uUpP])?$')
+        if (-not $answer) { $answer = $defaultScopeAnswer }
         $Scope = if ($answer -match '^[pP]$') { 'Project' } else { 'User' }
     }
 }
@@ -304,6 +310,9 @@ Write-Host ("Skills ({0}): {1}" -f $desired.Count, ($desired -join ', '))
 Write-Host ("Install/update: {0}; remove previously managed: {1}" -f $change.Count, $remove.Count)
 if ($remove.Count) { Write-Host ('Remove: ' + ($remove -join ', ')) }
 if ($null -ne $newAgentsText) { Write-Host "Work policy: $agentsPath (other content preserved)" }
+if ($isWork -and $Scope -eq 'User') {
+    Write-Warning 'User-scoped work skills are discoverable across repositories for this client. No repository AGENTS.md work policy will be written.'
+}
 if (-not $PSCmdlet.ShouldProcess($installRoot, "Install $Profile and its dependencies; preserve backups of replaced files")) { return }
 
 $transactionRoot = Join-Path $stateRoot ('backups\' + [DateTime]::UtcNow.ToString('yyyyMMddTHHmmssZ') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8))

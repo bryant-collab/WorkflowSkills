@@ -118,10 +118,9 @@ try {
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $malformed '.agents'))) 'Malformed policy partly installed'
     Passed 'Malformed policy blocks writes'
 
-    Assert-Throws { & $installer -Profile WorkCore -Scope User -UserPath $testRoot *> $null } 'require Project scope'
     $workRepository = Join-Path $testRoot 'WorkCore'
     Assert-Throws { Install-Profile 'HomeFull' $workRepository } 'work policy'
-    Passed 'Work cannot install user-wide or silently become a home profile'
+    Passed 'Work policy prevents a work destination from silently becoming a home profile'
 
     $portableUser = New-Repository 'portable user'
     & $installer -Profile PRDelivery -Scope User -UserPath $portableUser *> $null

@@ -96,15 +96,18 @@ Choose the target client in the interactive menu or pass `-Client Codex`, `-Clie
 
 PR delivery never starts ongoing observation. Both standalone PR modules stop before merge and auto-merge. `pr-babysit` does not depend on `pr-delivery`, and vice versa. The existing `github-delivery` and `poteto-mode` remain available in the home collection; work profiles exclude them so they cannot pull combined PR workflows into the work dependency closure.
 
-Work profiles require a destination repository and install into the selected client's skill directory. They also add or update a marked block in root `AGENTS.md`, preserving other content. This block prohibits AI merging/auto-merge, identifies Jira as the requirements source, and enables or disables delivery and ongoing babysitting according to the selected modules. A requested one-time read-only status check remains allowed when babysitting is disabled. Enabled babysitting requires a specific request and one observer coordinated with the user's existing PR monitor application.
+Work profiles can install at user scope or in a destination repository. Repository installs add or update a marked block in root `AGENTS.md`, preserving other content. This block prohibits AI merging/auto-merge, identifies Jira as the requirements source, and enables or disables delivery and ongoing babysitting according to the selected modules. A requested one-time read-only status check remains allowed when babysitting is disabled. Enabled babysitting requires a specific request and one observer coordinated with the user's existing PR monitor application. User-scoped work skills are discoverable across repositories for that client and do not write a repository `AGENTS.md` policy block.
 
-For home and individual modules, choose user-wide or repository scope. If both home and work are on the same user account, user-wide and ancestor skills remain discoverable in a work repository; project installation does not hide them. The work `AGENTS.md` block governs their use there. Separate user environments are necessary if you require physical separation of available skills. These instructions are workflow policy, not a Git-host permission control; repository protections remain independent. See the official [skill locations](https://learn.chatgpt.com/docs/build-skills) and [project guidance](https://learn.chatgpt.com/docs/customization/overview).
+For every profile, choose user-wide or repository scope. If both home and work are on the same user account, user-wide and ancestor skills remain discoverable in a work repository; project installation does not hide them. A repository-scoped work install writes its work policy block there. Separate user environments are necessary if you require physical separation of available skills. These instructions are workflow policy, not a Git-host permission control; repository protections remain independent. See the official [skill locations](https://learn.chatgpt.com/docs/build-skills) and [project guidance](https://learn.chatgpt.com/docs/customization/overview).
 
 Parameters support repeatable installation and previews:
 
 ```powershell
 # Preview the work set without writing files.
 .\install.ps1 -Profile WorkCore -Client Codex -ProjectPath D:\git\WorkApp -WhatIf
+
+# Install work skills in this user's Codex skill directory.
+.\install.ps1 -Profile WorkCore -Client Codex -Scope User
 
 # Install work skills and policy for Copilot in the selected repository.
 .\install.ps1 -Profile WorkCore -Client Copilot -ProjectPath D:\git\WorkApp
