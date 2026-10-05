@@ -74,13 +74,15 @@ The other 24 skills are `principle-*` references. Load the principle that change
 
 ## Install selected skills
 
-Run the interactive installer from this checkout:
+Run the interactive installer from this checkout. It asks for the profile, client, and install scope:
 
 ```powershell
 .\install.ps1
 ```
 
 It asks which set to install and where to install it, then copies complete skill folders and their dependency closure. It works with Windows PowerShell 5.1 and is designed for PowerShell 7 as well; testing was performed on Windows PowerShell 5.1. No download, tool installation, authentication, watcher, or global configuration change is performed.
+
+Choose the target client in the interactive menu or pass `-Client Codex`, `-Client Copilot`, `-Client ClaudeCode`, or `-Client All`. Codex and Copilot share `.agents/skills`, which both clients discover. Claude Code uses `.claude/skills`. `All` installs the selected profile to both skill roots, preflighting both before it writes either one. Each root keeps its own receipt and backups outside the skill discovery folder. For backward compatibility, a command-line install that supplies `-Profile` but omits `-Client` targets Codex.
 
 | Menu | Profile | Fresh install | Behavior |
 | --- | --- | --- | --- |
@@ -94,7 +96,7 @@ It asks which set to install and where to install it, then copies complete skill
 
 PR delivery never starts ongoing observation. Both standalone PR modules stop before merge and auto-merge. `pr-babysit` does not depend on `pr-delivery`, and vice versa. The existing `github-delivery` and `poteto-mode` remain available in the home collection; work profiles exclude them so they cannot pull combined PR workflows into the work dependency closure.
 
-Work profiles require a destination repository and install into its `.agents/skills`. They also add or update a marked block in root `AGENTS.md`, preserving other content. This block prohibits AI merging/auto-merge, identifies Jira as the requirements source, and enables or disables delivery and ongoing babysitting according to the selected modules. A requested one-time read-only status check remains allowed when babysitting is disabled. Enabled babysitting requires a specific request and one observer coordinated with the user's existing PR monitor application.
+Work profiles require a destination repository and install into the selected client's skill directory. They also add or update a marked block in root `AGENTS.md`, preserving other content. This block prohibits AI merging/auto-merge, identifies Jira as the requirements source, and enables or disables delivery and ongoing babysitting according to the selected modules. A requested one-time read-only status check remains allowed when babysitting is disabled. Enabled babysitting requires a specific request and one observer coordinated with the user's existing PR monitor application.
 
 For home and individual modules, choose user-wide or repository scope. If both home and work are on the same user account, user-wide and ancestor skills remain discoverable in a work repository; project installation does not hide them. The work `AGENTS.md` block governs their use there. Separate user environments are necessary if you require physical separation of available skills. These instructions are workflow policy, not a Git-host permission control; repository protections remain independent. See the official [skill locations](https://learn.chatgpt.com/docs/build-skills) and [project guidance](https://learn.chatgpt.com/docs/customization/overview).
 
@@ -102,10 +104,16 @@ Parameters support repeatable installation and previews:
 
 ```powershell
 # Preview the work set without writing files.
-.\install.ps1 -Profile WorkCore -ProjectPath D:\git\WorkApp -WhatIf
+.\install.ps1 -Profile WorkCore -Client Codex -ProjectPath D:\git\WorkApp -WhatIf
 
-# Install work skills and policy into the selected repository.
-.\install.ps1 -Profile WorkCore -ProjectPath D:\git\WorkApp
+# Install work skills and policy for Copilot in the selected repository.
+.\install.ps1 -Profile WorkCore -Client Copilot -ProjectPath D:\git\WorkApp
+
+# Install work skills and policy for Claude Code.
+.\install.ps1 -Profile WorkCore -Client ClaudeCode -ProjectPath D:\git\WorkApp
+
+# Install the full home collection for all supported clients.
+.\install.ps1 -Profile HomeFull -Client All -Scope User
 
 # Add only delivery later; existing work skills and no-merge policy remain.
 .\install.ps1 -Profile PRDelivery -Scope Project -ProjectPath D:\git\WorkApp
@@ -119,13 +127,13 @@ Parameters support repeatable installation and previews:
 
 Home/work profiles replace the installer's previously managed selection at that destination; individual PR options are additive. Selecting `WorkCore` after `WorkBoth` removes unchanged, previously managed PR modules and disables their work policy entries. It does not delete unmanaged skills or silently turn a work destination into a home destination. Use a separate destination for home. Updates/removal stop before writing if a managed skill has local edits or a requested name already exists unmanaged; reconcile or back up those files yourself before retrying.
 
-Receipts, retained previous folders, and a license copy live in `.agents/.workflowskills`, outside the skill discovery tree. Copies are staged and checked before replacement; installation failures restore replaced skill folders and policy. Windows PowerShell users with very long destination paths should use a shorter checkout path or PowerShell 7. If installed skills do not appear, restart Codex.
+Receipts, retained previous folders, and a license copy live in each client's `.workflowskills` state folder, outside the skill discovery tree. Copies are staged and checked before replacement; installation failures restore replaced skill folders and policy. Windows PowerShell users with very long destination paths should use a shorter checkout path or PowerShell 7. If skills do not appear, refresh or restart the selected client's session. Claude Code can reload project skills with `/reload-skills`.
 
 The Jira workflow discovers integrations already available in the session; the installer does not provide a Jira connector or credentials. Without live Jira access, supplied ticket text remains usable and unverified live state is identified. Ticket changes, comments, and transitions require authorization for those actions. C# verification uses each repository's actual .NET SDK, tests, analyzers, and runtime paths.
 
 ### Manual selection
 
-This repository is the source collection. For personal use across repositories, copy selected skill folders to your user's `.agents/skills`. For team use, copy them to a project's `.agents/skills`. Codex supports these locations and explicit or automatic invocation; see [official Build skills documentation](https://learn.chatgpt.com/docs/build-skills). Check for duplicate names first and confirm discovery in a fresh session.
+This repository is the source collection. For personal use across repositories, copy selected skill folders to the chosen client's user skill directory. For team use, copy them to a project skill directory: Codex and Copilot share `.agents/skills`; Claude Code uses `.claude/skills`. Keep each selected skill's dependency closure and full folder so relative references resolve. The PowerShell copy example below targets Codex and Copilot; set `$installRoot` to the matching `.claude\skills` path for Claude Code. See [official Build skills documentation](https://learn.chatgpt.com/docs/build-skills) and [project guidance](https://learn.chatgpt.com/docs/customization/overview). Check for duplicate names first and confirm discovery in a fresh session.
 
 Include the selected skills' dependency closure and each complete skill folder. For example, this PowerShell snippet installs `how`, `tdd` and `github-delivery` with their referenced siblings. Change the selection before running it:
 
@@ -162,7 +170,7 @@ Record copied destinations and hashes for updates or removal. Preserve later edi
 
 ## Use a skill
 
-After discovery, select the skill in the client's skill picker or mention its name. Codex CLI and IDE extension support `$skill-name`; automatic selection uses the manifest's description. These are example prompts, not shell commands. [Invocation documentation](https://learn.chatgpt.com/docs/build-skills)
+After discovery, select the skill in the client's picker or invoke it by name. Codex CLI and IDE extension use `$skill-name`; Copilot and Claude Code use `/skill-name`. All can select a skill automatically when its description matches. These are example prompts, not shell commands; the examples below use Codex syntax. [Invocation documentation](https://learn.chatgpt.com/docs/build-skills)
 
 ```text
 $how Explain how this repository loads configuration.

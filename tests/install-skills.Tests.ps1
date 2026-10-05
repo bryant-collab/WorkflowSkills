@@ -131,7 +131,7 @@ try {
 
     $interactive = New-Repository 'interactive'
     $mockAnswers = New-Object 'System.Collections.Generic.Queue[string]'
-    foreach ($answer in @('7', 'P', $interactive)) { $mockAnswers.Enqueue($answer) }
+    foreach ($answer in @('7', '1', 'P', $interactive)) { $mockAnswers.Enqueue($answer) }
     Set-Item Function:\Read-Host -Value ({ param([string]$Prompt) return $mockAnswers.Dequeue() }.GetNewClosure())
     try { & $installer *> $null }
     finally { Remove-Item Function:\Read-Host }

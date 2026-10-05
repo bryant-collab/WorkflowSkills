@@ -8,11 +8,17 @@ Interactively install WorkflowSkills, or select a profile with parameters.
 .\install.ps1 -Profile WorkCore -ProjectPath D:\git\WorkApp -WhatIf
 .EXAMPLE
 .\install.ps1 -Profile PRDelivery -Scope Project -ProjectPath D:\git\WorkApp
+.EXAMPLE
+.\install.ps1 -Profile WorkCore -Client ClaudeCode -ProjectPath D:\git\WorkApp
+.EXAMPLE
+.\install.ps1 -Profile HomeFull -Client All -Scope User
 #>
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
 param(
     [ValidateSet('HomeFull', 'WorkCore', 'WorkDelivery', 'WorkBabysit', 'WorkBoth', 'PRDelivery', 'PRBabysit')]
     [string]$Profile,
+    [ValidateSet('Codex', 'Copilot', 'ClaudeCode', 'All')]
+    [string]$Client,
     [ValidateSet('User', 'Project')]
     [string]$Scope,
     [string]$ProjectPath,
@@ -87,6 +93,7 @@ function Resolve-Skills([string[]]$Seeds, [hashtable]$Map) {
     return @($seen | Sort-Object)
 }
 
+$selectedProfileInteractively = -not $Profile
 if (-not $Profile) {
     Write-Host "`nWorkflowSkills installation"
     Write-Host '1. Home full collection (includes both PR modules; excludes work-only skills)'
@@ -101,6 +108,20 @@ if (-not $Profile) {
     do { $answer = (Read-Host 'Choose an option').Trim() } while ($answer -notmatch '^[1-7qQ]$')
     if ($answer -match '^[qQ]$') { return }
     $Profile = $choices[[int]$answer - 1]
+}
+if (-not $Client) {
+    if ($selectedProfileInteractively) {
+        Write-Host "`nChoose the client that should discover these skills"
+        Write-Host '1. Codex'
+        Write-Host '2. GitHub Copilot (shares the .agents/skills location with Codex)'
+        Write-Host '3. Claude Code'
+        Write-Host '4. All clients'
+        do { $answer = (Read-Host 'Choose a client').Trim() } while ($answer -notmatch '^[1-4]$')
+        $Client = @('Codex', 'Copilot', 'ClaudeCode', 'All')[[int]$answer - 1]
+    } else {
+        # Preserve existing scripted invocations that predate client selection.
+        $Client = 'Codex'
+    }
 }
 
 $isWork = $Profile.StartsWith('Work')
@@ -127,10 +148,41 @@ if ($Scope -eq 'Project') {
     if ($ProjectPath) { throw 'ProjectPath cannot be combined with User scope.' }
     $destinationBase = Get-FullPath $UserPath
 }
-$agentsRoot = Join-Path $destinationBase '.agents'
-$installRoot = Join-Path $agentsRoot 'skills'
+$clientTargets = if ($Client -eq 'All') { @('Codex', 'ClaudeCode') } else { @($Client) }
+if ($Client -eq 'All') {
+    $confirmValue = if ($PSBoundParameters.ContainsKey('Confirm')) { [bool]$PSBoundParameters['Confirm'] } else { $false }
+    $installerPath = $PSCommandPath
+    $invokeTarget = {
+        param([string]$TargetClient, [bool]$UseWhatIf, [bool]$UseConfirm)
+        $arguments = @{
+            Profile = $Profile
+            Client = $TargetClient
+            Scope = $Scope
+            UserPath = $UserPath
+        }
+        if ($ProjectPath) { $arguments.ProjectPath = $ProjectPath }
+        if ($UseWhatIf) { $arguments.WhatIf = $true }
+        if ($UseConfirm) { $arguments.Confirm = $confirmValue }
+        & $installerPath @arguments
+        if (-not $?) { throw "Installation did not complete for client $TargetClient." }
+    }.GetNewClosure()
+
+    # Validate every destination before changing any client installation.
+    foreach ($targetClient in $clientTargets) { & $invokeTarget $targetClient $true $false }
+    if ($WhatIfPreference) {
+        Write-Host 'All-client preflight completed; no files were written.'
+        return
+    }
+    $confirmWasSpecified = $PSBoundParameters.ContainsKey('Confirm')
+    foreach ($targetClient in $clientTargets) { & $invokeTarget $targetClient $false $confirmWasSpecified }
+    return
+}
+
+$clientFolder = if ($Client -eq 'ClaudeCode') { '.claude' } else { '.agents' }
+$clientRoot = Join-Path $destinationBase $clientFolder
+$installRoot = Join-Path $clientRoot 'skills'
 # Backups are outside the skill discovery tree.
-$stateRoot = Join-Path $agentsRoot '.workflowskills'
+$stateRoot = Join-Path $clientRoot '.workflowskills'
 $receiptPath = Join-Path $stateRoot 'receipt.json'
 Assert-NoLinks $installRoot
 Assert-NoLinks $stateRoot
@@ -246,7 +298,7 @@ $change = @($desired | Where-Object {
     -not (Test-Path -LiteralPath (Join-Path $installRoot $_)) -or
     -not $installed.ContainsKey($_) -or $installed[$_] -ne $sourceHashes[$_]
 })
-Write-Host "`nProfile: $Profile; scope: $Scope"
+Write-Host "`nProfile: $Profile; client: $Client; scope: $Scope"
 Write-Host "Destination: $installRoot"
 Write-Host ("Skills ({0}): {1}" -f $desired.Count, ($desired -join ', '))
 Write-Host ("Install/update: {0}; remove previously managed: {1}" -f $change.Count, $remove.Count)
@@ -339,4 +391,4 @@ try {
 }
 Write-Host "Installed successfully. Receipt/license: $stateRoot"
 Write-Host "Backups: $transactionRoot"
-Write-Host 'If skills do not appear, restart Codex. No tools, credentials, watchers, or global settings were configured.'
+Write-Host "If skills do not appear, refresh or restart the $Client session. No tools, credentials, watchers, or global settings were configured."
